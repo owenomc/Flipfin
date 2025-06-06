@@ -1,6 +1,8 @@
 import { Platform } from 'react-native';
+import type { ComponentType } from 'react';
 
-let LandingPageUI;
+let LandingPageUI: ComponentType;
+
 if (Platform.OS === 'web') {
   LandingPageUI = require('./LandingPage.web').default;
 } else {

@@ -1,9 +1,6 @@
-import React from 'react';
 import type { ComponentType } from 'react';
 
-// Explicitly type the import
-
-import type { ComponentType as LandingPageType } from 'react';
-const LandingPage = require('./LandingPage').default as LandingPageType<any>;
+// Import dynamically and cast with type
+const LandingPage = require('./LandingPage').default as ComponentType<any>;
 
 export default LandingPage;
