@@ -8,13 +8,19 @@ import {
   StyleSheet,
 } from "react-native";
 import globalStyles from "../styles/global";
+import NavBar from "./components/NavBar";
 
 const LandingPage = () => {
   const styles = globalStyles();
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={[styles.scrollContent, localStyles.scrollContent]}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          localStyles.scrollContent,
+        ]}
+      >
         <View style={localStyles.card}>
           <Image
             source={require("../assets/images/flippy.jpg")}
@@ -22,15 +28,20 @@ const LandingPage = () => {
             resizeMode="contain"
           />
           <Text style={localStyles.logo}>Flipfin - Financial AI</Text>
-          <Text style={localStyles.tagline}>Bite-sized lessons. Big financial wins.</Text>
+          <Text style={localStyles.tagline}>
+            Bite-sized lessons. Big financial wins.
+          </Text>
           <View style={localStyles.featuresCard}>
             <Text style={localStyles.feature}>🎯 Personalized Learning</Text>
             <Text style={localStyles.feature}>🧠 Gamified Education</Text>
-            <Text style={localStyles.feature}>💸 Real-Life Financial Skills</Text>
+            <Text style={localStyles.feature}>
+              💸 Real-Life Financial Skills
+            </Text>
             <Text style={localStyles.feature}>🤖 AI Finance Coach</Text>
           </View>
         </View>
       </ScrollView>
+      <NavBar colorScheme="dark" />
     </SafeAreaView>
   );
 };

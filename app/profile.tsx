@@ -10,10 +10,11 @@ import {
   TextInput,
   Alert,
 } from "react-native";
-import { auth , db } from "../firebaseConfig";
+import { auth, db } from "../firebaseConfig";
 import { signOut, onAuthStateChanged, User } from "firebase/auth";
 import { useRouter } from "expo-router";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import NavBar from "./components/NavBar";
 
 type UserProfile = {
   username?: string;
@@ -37,9 +38,7 @@ export default function Profile() {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
-      if (!currentUser) {
-        router.replace("/auth/login");
-      }
+      // No redirect needed
     });
     return unsubscribe;
   }, []);
@@ -104,8 +103,13 @@ export default function Profile() {
   if (profile?.createdAt) {
     if (typeof profile.createdAt === "string") {
       formattedDate = new Date(profile.createdAt).toLocaleDateString();
-    } else if (typeof profile.createdAt === "object" && "seconds" in profile.createdAt) {
-      formattedDate = new Date(profile.createdAt.seconds * 1000).toLocaleDateString();
+    } else if (
+      typeof profile.createdAt === "object" &&
+      "seconds" in profile.createdAt
+    ) {
+      formattedDate = new Date(
+        profile.createdAt.seconds * 1000
+      ).toLocaleDateString();
     }
   }
 
@@ -117,24 +121,23 @@ export default function Profile() {
           <Text style={styles.subtitle}>Account Information</Text>
           <View style={styles.infoBox}>
             <Text style={styles.label}>Email:</Text>
-            <Text style={styles.value}>{user?.email ?? "."}</Text>
+            <Text style={styles.value}>{user?.email}</Text>
           </View>
           <View style={styles.infoBox}>
             <Text style={styles.label}>Username:</Text>
-            <Text style={styles.value}>{profile?.username ?? "."}</Text>
+            <Text style={styles.value}>{profile?.username}</Text>
           </View>
           <View style={styles.infoBox}>
             <Text style={styles.label}>Age:</Text>
-            <Text style={styles.value}>{profile?.age ?? "."}
-            </Text>
+            <Text style={styles.value}>{profile?.age}</Text>
           </View>
           <View style={styles.infoBox}>
             <Text style={styles.label}>Date Signed Up:</Text>
-            <Text style={styles.value}>{formattedDate ?? "."}</Text>
+            <Text style={styles.value}>{formattedDate}</Text>
           </View>
           <View style={styles.infoBox}>
             <Text style={styles.label}>User ID:</Text>
-            <Text style={styles.value}>{user?.uid ?? "."}</Text>
+            <Text style={styles.value}>{user?.uid}</Text>
           </View>
 
           {/* Editable fields below */}
@@ -176,6 +179,7 @@ export default function Profile() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <NavBar colorScheme="dark" />
     </SafeAreaView>
   );
 }

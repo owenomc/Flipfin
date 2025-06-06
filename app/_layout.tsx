@@ -1,7 +1,6 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Slot } from "expo-router";
-import NavBar from "./components/NavBar";
 
 export default function RootLayout() {
   return (
@@ -9,7 +8,6 @@ export default function RootLayout() {
       <View style={styles.content}>
         <Slot /> {/* This renders the current page */}
       </View>
-      <NavBar colorScheme="dark" />
     </View>
   );
 }
