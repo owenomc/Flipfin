@@ -7,7 +7,7 @@ const NavBar = ({ colorScheme }: { colorScheme?: "light" | "dark" }) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const tabs = [
+  const tabs: { label: string; icon: string; route: "/landing" | "/explore" | "/learn" | "/coach" | "/profile" }[] = [
     { label: "Home", icon: "home", route: "/landing" },
     { label: "Explore", icon: "compass", route: "/explore" },
     { label: "Learn", icon: "school", route: "/learn" },
@@ -18,12 +18,16 @@ const NavBar = ({ colorScheme }: { colorScheme?: "light" | "dark" }) => {
   return (
     <View style={styles.navBar}>
       {tabs.map((tab) => {
-        const isActive = pathname === tab.route;
+        const isActive = pathname === tab.route || pathname?.startsWith(tab.route + "/");
         return (
           <TouchableOpacity
             key={tab.route}
             style={styles.navButton}
-            onPress={() => router.replace(tab.route as any)}
+            onPress={() => {
+              if (!isActive) {
+                router.push(tab.route as any);
+              }
+            }}
           >
             <Ionicons
               name={tab.icon as any}

@@ -84,26 +84,20 @@ export default function Profile() {
       await updateDoc(docRef, {
         username: editUsername.trim(),
         age: editAge ? ageNum : null,
+        updatedAt: new Date().toISOString(),
       });
-      setProfile((prev) => ({
-        ...prev,
-        username: editUsername.trim(),
-        age: editAge ? ageNum : undefined,
-      }));
+      // Fetch the updated profile from Firestore to ensure it's in sync
+      const updatedSnap = await getDoc(docRef);
+      if (updatedSnap.exists()) {
+        const updatedData = updatedSnap.data() as UserProfile;
+        setProfile(updatedData);
+      }
       Alert.alert("Profile updated!");
     } catch (e) {
       Alert.alert("Error updating profile", (e as Error).message);
     }
     setSaving(false);
   };
-
-  if (loading || profileLoading) {
-    return (
-      <View style={styles.screen}>
-        <ActivityIndicator size="large" color="#0077b6" />
-      </View>
-    );
-  }
 
   // Format Firestore Timestamp or string date
   let formattedDate = "";
@@ -123,10 +117,29 @@ export default function Profile() {
           <Text style={styles.subtitle}>Account Information</Text>
           <View style={styles.infoBox}>
             <Text style={styles.label}>Email:</Text>
-            <Text style={styles.value}>{user?.email}</Text>
+            <Text style={styles.value}>{user?.email ?? "."}</Text>
           </View>
           <View style={styles.infoBox}>
             <Text style={styles.label}>Username:</Text>
+            <Text style={styles.value}>{profile?.username ?? "."}</Text>
+          </View>
+          <View style={styles.infoBox}>
+            <Text style={styles.label}>Age:</Text>
+            <Text style={styles.value}>{profile?.age ?? "."}
+            </Text>
+          </View>
+          <View style={styles.infoBox}>
+            <Text style={styles.label}>Date Signed Up:</Text>
+            <Text style={styles.value}>{formattedDate ?? "."}</Text>
+          </View>
+          <View style={styles.infoBox}>
+            <Text style={styles.label}>User ID:</Text>
+            <Text style={styles.value}>{user?.uid ?? "."}</Text>
+          </View>
+
+          {/* Editable fields below */}
+          <View style={styles.infoBox}>
+            <Text style={styles.label}>Update Username:</Text>
             <TextInput
               style={styles.input}
               value={editUsername}
@@ -137,7 +150,7 @@ export default function Profile() {
             />
           </View>
           <View style={styles.infoBox}>
-            <Text style={styles.label}>Age:</Text>
+            <Text style={styles.label}>Update Age:</Text>
             <TextInput
               style={styles.input}
               value={editAge}
@@ -146,14 +159,6 @@ export default function Profile() {
               placeholderTextColor="#888"
               keyboardType="numeric"
             />
-          </View>
-          <View style={styles.infoBox}>
-            <Text style={styles.label}>Date Signed Up:</Text>
-            <Text style={styles.value}>{formattedDate || "—"}</Text>
-          </View>
-          <View style={styles.infoBox}>
-            <Text style={styles.label}>User ID:</Text>
-            <Text style={styles.value}>{user?.uid}</Text>
           </View>
           <TouchableOpacity
             style={[styles.button, saving && { opacity: 0.7 }]}
@@ -178,6 +183,12 @@ export default function Profile() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+    backgroundColor: "#f6f8fa",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "#f6f8fa",
   },
   scrollContent: {
@@ -232,6 +243,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#22223b",
     fontWeight: "500",
+    marginTop: 4,
   },
   input: {
     width: "100%",

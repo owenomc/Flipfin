@@ -15,6 +15,11 @@ export default function SignUp() {
 
   const handleSignUp = async () => {
     setError('');
+    // Require all fields to be filled
+    if (!email.trim() || !password.trim() || !username.trim() || !age.trim()) {
+      setError('All fields are required.');
+      return;
+    }
     if (!username.trim()) {
       setError('Username is required.');
       return;
