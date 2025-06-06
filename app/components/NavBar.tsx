@@ -1,48 +1,64 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React from "react";
+import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
+import { Ionicons, MaterialCommunityIcons, FontAwesome } from "@expo/vector-icons";
 
-const NavBar = () => (
-  <View style={styles.navbar}>
-    <Text style={styles.brand}>Flipfin</Text>
-    <View style={styles.links}>
-      <TouchableOpacity>
-        <Text style={styles.link}>Home</Text>
+type NavBarProps = {
+  colorScheme: "light" | "dark";
+};
+
+const NavBar = ({ colorScheme }: NavBarProps) => {
+  const router = useRouter();
+  const themeColor = colorScheme === "dark" ? "#90caf9" : "#0077b6";
+  const bgColor = colorScheme === "dark" ? "#1a1a1a" : "#fff";
+  const borderColor = colorScheme === "dark" ? "#222c36" : "#eee";
+  const labelColor = themeColor;
+
+  return (
+    <View style={[styles.navbar, { backgroundColor: bgColor, borderTopColor: borderColor }]}>
+      <TouchableOpacity style={styles.navItem} onPress={() => router.push("./lessons")}>
+        <Ionicons name="book" size={28} color={themeColor} />
+        <Text style={[styles.label, { color: labelColor }]}>Lessons</Text>
       </TouchableOpacity>
-      <TouchableOpacity>
-        <Text style={styles.link}>Features</Text>
+      <TouchableOpacity style={styles.navItem} onPress={() => router.push("./skilltree")}>
+        <MaterialCommunityIcons name="tree" size={28} color={themeColor} />
+        <Text style={[styles.label, { color: labelColor }]}>Skilltree</Text>
       </TouchableOpacity>
-      <TouchableOpacity>
-        <Text style={styles.link}>Contact</Text>
+      <TouchableOpacity style={styles.navItem} onPress={() => router.push("./profile")}>
+        <FontAwesome name="user" size={28} color={themeColor} />
+        <Text style={[styles.label, { color: labelColor }]}>Profile</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.navItem} onPress={() => router.push("./settings")}>
+        <Ionicons name="settings" size={28} color={themeColor} />
+        <Text style={[styles.label, { color: labelColor }]}>Settings</Text>
       </TouchableOpacity>
     </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    elevation: 2,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    height: 64,
+    backgroundColor: "#fff", // overridden dynamically
+    borderTopWidth: 1,
+    borderTopColor: "#eee", // overridden dynamically
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 100,
   },
-  brand: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#0077b6',
+  navItem: {
+    alignItems: "center",
+    flex: 1,
   },
-  links: {
-    flexDirection: 'row',
-  },
-  link: {
-    marginLeft: 18,
-    fontSize: 16,
-    color: '#023e8a',
-    fontWeight: '500',
+  label: {
+    fontSize: 12,
+    color: "#0077b6", // overridden dynamically
+    marginTop: 2,
   },
 });
 

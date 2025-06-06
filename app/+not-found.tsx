@@ -9,8 +9,8 @@ export default function NotFound() {
     <View style={styles.container}>
       <Text style={styles.emoji}>🦈</Text>
       <Text style={styles.title}>Page Not Found</Text>
-      <Text style={styles.subtitle}>Sorry, we couldn't find that page.</Text>
-      <TouchableOpacity style={styles.button} onPress={() => router.replace('/')}>
+      <Text style={styles.subtitle}>Sorry, we couldn&apos;t find that page.</Text>
+      <TouchableOpacity style={styles.button} onPress={() => router.replace('./landing')}>
         <Text style={styles.buttonText}>Go Home</Text>
       </TouchableOpacity>
     </View>
