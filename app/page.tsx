@@ -1,103 +1,83 @@
-import Image from "next/image";
+"use client";
+
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-gradient-to-br from-white to-gray-100 dark:from-[#18181b] dark:to-[#232329] flex">
+      {/* Persistent Left Sidebar */}
+      <aside className="w-80 bg-white dark:bg-[#121212] shadow-lg border-l border-gray-200 dark:border-gray-700 flex flex-col p-6">
+        <p className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+          News
+        </p>
+      </aside>
+      
+      {/* Main Content - takes full width minus sidebar */}
+      <main className="flex-grow flex flex-col items-center px-6 py-10 max-w-4xl mx-auto">
+        <h2 className="text-4xl font-bold text-center text-gray-900 dark:text-white mb-10">
+          Finance AI
+        </h2>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+        <div className="w-full grid gap-6">
+          {/* Lesson Card */}
+          <div className="bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 px-6 py-5 flex items-center justify-between">
+            <div>
+              <h3 className="text-xl font-bold text-gray-800 dark:text-white">
+                🏁 Unit 1: Checking & Savings
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Learn the difference, earn your first XP!
+              </p>
+            </div>
+            <button className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-full shadow">
+              Start
+            </button>
+          </div>
+
+          {/* Locked Lesson */}
+          <div className="opacity-50 bg-gray-100 dark:bg-[#2a2a2a] rounded-2xl px-6 py-5 border border-dashed border-gray-300 dark:border-gray-600 flex justify-between items-center">
+            <div>
+              <h3 className="text-xl font-bold text-gray-400 dark:text-gray-500">
+                🔒 Unit 2: Budgeting Basics
+              </h3>
+              <p className="text-sm text-gray-400 dark:text-gray-500">
+                Unlock Unit 1 to continue
+              </p>
+            </div>
+            <span className="text-gray-400 dark:text-gray-500">Locked</span>
+          </div>
+        </div>
+
+        {/* XP Progress */}
+        <div className="mt-12 w-full max-w-sm text-center">
+          <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+            🎯 Daily Goal: Earn 10 XP
+          </p>
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+            <div
+              className="bg-yellow-400 h-full rounded-full transition-all"
+              style={{ width: "30%" }}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+      {/* Persistent Right Sidebar */}
+      <aside className="w-80 bg-white dark:bg-[#121212] shadow-lg border-l border-gray-200 dark:border-gray-700 flex flex-col p-6">
+        <p className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+          Profile
+        </p>
+
+        <button
+          type="submit"
+          className="w-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold py-3 px-6 shadow-md hover:from-blue-600 hover:to-indigo-600 transition-colors text-base"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <Link href="/profile">Sign In</Link>
+        </button>
+        <div className="text-sm text-gray-500 dark:text-gray-400 mt-auto">
+          &copy; {new Date().getFullYear()} Finance
+        </div>
+      </aside>
     </div>
   );
 }
