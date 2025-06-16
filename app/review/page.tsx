@@ -11,7 +11,7 @@ export default function Games() {
       <LeftSidebar />
 
       {/* Right Sidebar (desktop and up) */}
-      <RightSidebar user={null} />
+      <RightSidebar />
 
       {/* Mobile Top Navigation */}
       <MobileNav />

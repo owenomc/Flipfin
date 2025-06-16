@@ -11,6 +11,9 @@ importers:
       '@splinetool/react-spline':
         specifier: ^4.0.0
         version: 4.0.0(@splinetool/runtime@1.10.7)(next@15.3.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@stripe/stripe-js':
+        specifier: ^7.3.1
+        version: 7.3.1
       '@supabase/supabase-js':
         specifier: ^2.50.0
         version: 2.50.0
@@ -375,6 +378,10 @@ packages:
 
   '@splinetool/runtime@1.10.7':
     resolution: {integrity: sha512-aHbdWtHzcd185hEO1MVrZFL0u+udSSJtlaRFMmad/SZNqwEUp2A7zVkTpnlBlGV5yAhJjYre8cTkx8xbzMiBXQ==}
+
+  '@stripe/stripe-js@7.3.1':
+    resolution: {integrity: sha512-pTzb864TQWDRQBPLgSPFRoyjSDUqpCkbEgTzpsjiTjGz1Z5SxZNXJek28w1s6Dyry4CyW4/Izj5jHE/J9hCJYQ==}
+    engines: {node: '>=12.16'}
 
   '@supabase/auth-js@2.70.0':
     resolution: {integrity: sha512-BaAK/tOAZFJtzF1sE3gJ2FwTjLf4ky3PSvcvLGEgEmO4BSBkwWKu8l67rLLIBZPDnCyV7Owk2uPyKHa0kj5QGg==}
@@ -2197,6 +2204,8 @@ snapshots:
     dependencies:
       on-change: 4.0.2
       semver-compare: 1.0.0
+
+  '@stripe/stripe-js@7.3.1': {}
 
   '@supabase/auth-js@2.70.0':
     dependencies:
