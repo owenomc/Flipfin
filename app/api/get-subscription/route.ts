@@ -41,8 +41,9 @@ export async function GET(req: NextRequest) {
   });
 
   if (subscriptions.data.length === 0) {
-    return NextResponse.json({ error: "No subscription found." }, { status: 404 });
+    return NextResponse.json({ status: "none" });
   }
 
-  return NextResponse.json({ subscription: subscriptions.data[0] });
+  const subscription = subscriptions.data[0];
+  return NextResponse.json({ subscription, status: subscription.status });
 }
