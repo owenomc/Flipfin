@@ -1,103 +1,152 @@
-// app/profile/page.tsx
 "use client";
+import React, { useEffect, useState } from "react";
+import LeftSidebar from "@/app/components/LeftSidebar";
+import RightSidebar from "@/app/components/RightSidebar";
+import MobileNav from "@/app/components/MobileNav";
+import { supabase } from "@/app/utils/supabaseClient";
 
-import { useEffect, useState } from "react";
-import type { User } from "@supabase/supabase-js";
-import { createClient } from "@supabase/supabase-js";
-import SignIn from "../components/sign-in";
-import SignUp from "../components/sign-up";
-import ResetPassword from "../components/reset-password";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+type UserProfile = {
+  id: string;
+  email: string | undefined;
+  created_at: string | null;
+  user_metadata: {
+    display_name?: string;
+    phone?: string;
+    [key: string]: unknown;
+  } | null;
+};
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [showSignUp, setShowSignUp] = useState(false);
-  const [showReset, setShowReset] = useState(false);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  // remove loading state
+  // const [loading, setLoading] = useState(true);
+  const [displayName, setDisplayName] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-    return () => {
-      listener?.subscription.unsubscribe();
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error("Error fetching user:", error.message);
+        setUser(null);
+        setDisplayName("");
+      } else if (data.user) {
+        const userData = {
+          id: data.user.id,
+          email: data.user.email,
+          created_at: data.user.created_at,
+          user_metadata: data.user.user_metadata,
+        };
+        setUser(userData);
+        setDisplayName(data.user.user_metadata?.display_name || "");
+      } else {
+        setUser(null);
+        setDisplayName("");
+      }
+      // no loading state to update
     };
+
+    fetchUser();
   }, []);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
+  const updateDisplayName = async () => {
+    if (!user) return;
+    setSaving(true);
+    setMessage(null);
+
+    const { data, error } = await supabase.auth.updateUser({
+      data: {
+        ...user.user_metadata,
+        display_name: displayName,
+      },
+    });
+
+    if (error) {
+      setMessage(`Error updating display name: ${error.message}`);
+    } else if (data.user) {
+      setUser({
+        id: data.user.id,
+        email: data.user.email,
+        created_at: data.user.created_at,
+        user_metadata: data.user.user_metadata,
+      });
+      setMessage("Display name updated successfully!");
+    }
+
+    setSaving(false);
   };
 
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-[#18181b] p-4 sm:p-10">
-      <main className="bg-white/90 dark:bg-[#232329]/90 rounded-3xl shadow-xl p-8 sm:p-12 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-4">
-          Profile
-        </h1>
+  // Instead of blocking render, show main UI immediately
+  // Display fallback info if user is null
 
-        {!user ? (
-          <>
-            <p className="text-center text-gray-700 dark:text-gray-300 mb-4">
-              {showReset
-                ? "Reset your password"
-                : showSignUp
-                ? "Create an account"
-                : "Sign in to your account"}
-            </p>
-            <div className="bg-white dark:bg-[#1a1a1a] border dark:border-gray-700 rounded-xl p-6">
-              {showReset ? (
-                <ResetPassword />
-              ) : showSignUp ? (
-                <SignUp />
-              ) : (
-                <>
-                  <SignIn />
-                  <button
-                    className="text-blue-600 dark:text-blue-400 text-xs mt-2 underline"
-                    onClick={() => setShowReset(true)}
-                  >
-                    Forgot password?
-                  </button>
-                </>
-              )}
-              {!showReset && (
-                <button
-                  className="text-blue-600 dark:text-blue-400 text-xs mt-4 underline"
-                  onClick={() => setShowSignUp(!showSignUp)}
-                >
-                  {showSignUp
-                    ? "Already have an account? Sign In"
-                    : "Don't have an account? Sign Up"}
-                </button>
-              )}
-              {showReset && (
-                <button
-                  className="text-blue-600 dark:text-blue-400 text-xs mt-4 underline"
-                  onClick={() => setShowReset(false)}
-                >
-                  Back to Sign In
-                </button>
-              )}
-            </div>
-          </>
-        ) : (
-          <div className="flex flex-col items-center gap-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">Signed in as</p>
-            <p className="text-lg font-medium text-gray-900 dark:text-white">{user.email}</p>
+  return (
+    <main className="min-h-screen bg-gray-800 text-white relative">
+      <LeftSidebar />
+      <RightSidebar />
+      <MobileNav />
+
+      <section
+        className="
+          pt-20 px-4 pb-8
+          md:pl-72 md:pr-72 md:pt-10
+          max-w-5xl mx-auto
+          grid gap-6
+        "
+      >
+        <div
+          className="
+            bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl
+            p-6 transition
+          "
+        >
+          <h1 className="text-2xl font-bold mb-4">
+            Welcome, {user?.user_metadata?.display_name || "User"}
+          </h1>
+          {user ? (
+            <ul className="space-y-2 text-sm mb-6">
+              <li>
+                <strong>User ID:</strong> {user.id}
+              </li>
+              <li>
+                <strong>Email:</strong> {user.email || "No email provided"}
+              </li>
+              <li>
+                <strong>Phone:</strong> {user.user_metadata?.phone || "No phone number"}
+              </li>
+              <li>
+                <strong>Account Created:</strong>{" "}
+                {user.created_at ? new Date(user.created_at).toLocaleString() : "N/A"}
+              </li>
+            </ul>
+          ) : (
+            <p className="mb-6">User not logged in.</p>
+          )}
+
+          <div className="max-w-sm">
+            <label htmlFor="displayName" className="block font-semibold mb-1">
+              Edit Display Name:
+            </label>
+            <input
+              id="displayName"
+              type="text"
+              className="w-full rounded border border-gray-600 bg-gray-900 p-2 mb-2 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              disabled={saving || !user}
+              placeholder={user ? "" : "Sign in to edit"}
+            />
             <button
-              onClick={handleSignOut}
-              className="mt-4 px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-full"
+              onClick={updateDisplayName}
+              disabled={saving || !user}
+              className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white py-2 px-4 rounded transition"
             >
-              Sign Out
+              {saving ? "Saving..." : "Save"}
             </button>
+            {message && <p className="mt-2 text-sm">{message}</p>}
           </div>
-        )}
-      </main>
-    </div>
+        </div>
+      </section>
+    </main>
   );
 }
