@@ -112,11 +112,14 @@ export default function ProfilePage() {
                 <strong>Email:</strong> {user.email || "No email provided"}
               </li>
               <li>
-                <strong>Phone:</strong> {user.user_metadata?.phone || "No phone number"}
+                <strong>Phone:</strong>{" "}
+                {user.user_metadata?.phone || "No phone number"}
               </li>
               <li>
                 <strong>Account Created:</strong>{" "}
-                {user.created_at ? new Date(user.created_at).toLocaleString() : "N/A"}
+                {user.created_at
+                  ? new Date(user.created_at).toLocaleString()
+                  : "N/A"}
               </li>
             </ul>
           ) : (
@@ -146,6 +149,39 @@ export default function ProfilePage() {
             {message && <p className="mt-2 text-sm">{message}</p>}
           </div>
         </div>
+      </section>
+      <section
+        className="
+    pt-20 px-4 pb-8
+          md:pl-72 md:pr-72 md:pt-10
+          max-w-5xl mx-auto
+          grid gap-6
+  "
+      >
+        <h2 className="text-xl font-bold mb-3">
+          Supporter Badge & Subscription Status
+        </h2>
+        {user ? (
+          user.user_metadata?.supporterBadge ? (
+            <p className="text-green-400 font-semibold">
+              🎉 You have the Supporter Badge! Thank you for your support.
+            </p>
+          ) : (
+            <p className="text-yellow-300">
+              You do not have a Supporter Badge yet.{" "}
+              <a
+                href="https://buy.stripe.com/test_00wbJ1gTF6oifWd9gqdIA00"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-blue-400"
+              >
+                Buy Supporter Badge & Subscription
+              </a>
+            </p>
+          )
+        ) : (
+          <p>Please sign in to view your supporter status.</p>
+        )}
       </section>
     </main>
   );
