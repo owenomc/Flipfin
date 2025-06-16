@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
-import { createClient } from '@supabase/supabase-js';
+import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
+import { createClient } from "@supabase/supabase-js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-05-28.basil",
@@ -16,31 +16,42 @@ export async function POST(req: NextRequest) {
     const { userId, email } = await req.json();
 
     if (!userId || !email) {
-      return NextResponse.json({ error: 'userId and email are required' }, { status: 400 });
+      return NextResponse.json({ error: "userId and email are required" }, { status: 400 });
     }
 
-    // Create or find Stripe customer
-    let customer;
-    const customers = await stripe.customers.list({ email, limit: 1 });
-    if (customers.data.length > 0) {
-      customer = customers.data[0];
-    } else {
-      customer = await stripe.customers.create({ email });
+    // Check if user already has a Stripe customer ID
+    const { data: user, error: userError } = await supabase
+      .from("User")
+      .select("stripe_customer_id")
+      .eq("id", userId)
+      .single();
+
+    if (userError) {
+      return NextResponse.json({ error: userError.message }, { status: 500 });
     }
+
+    if (user && user.stripe_customer_id) {
+      // Already linked
+      return NextResponse.json({ stripe_customer_id: user.stripe_customer_id });
+    }
+
+    // Create Stripe customer
+    const customer = await stripe.customers.create({ email });
 
     // Update Supabase user with stripe_customer_id
-    const { error } = await supabase
+    const { error: updateError } = await supabase
       .from("User")
       .update({ stripe_customer_id: customer.id })
       .eq("id", userId);
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (updateError) {
+      return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
 
-    return NextResponse.json({ customer });
+    return NextResponse.json({ stripe_customer_id: customer.id });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error(error);
+    const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
