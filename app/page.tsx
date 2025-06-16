@@ -1,14 +1,60 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import LeftSidebar from "@/app/components/LeftSidebar";
 import RightSidebar from "@/app/components/RightSidebar";
 import MobileNav from "@/app/components/MobileNav";
 import Tree from "@/app/components/tree";
 import { Droplet } from "lucide-react";
+import { useSupabaseClient, User } from "@supabase/auth-helpers-react";
+import { useRouter } from "next/navigation";
 
 export default function TreeDashboard() {
+  const supabase = useSupabaseClient();
+  const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Always fetch the latest user data after mount (especially after Stripe redirect)
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+    });
+  }, [supabase]);
+
+  const refreshSession = async () => {
+    // This will refresh the session and user_metadata
+    await supabase.auth.refreshSession();
+    const { data } = await supabase.auth.getUser();
+    setUser(data.user);
+    router.refresh(); // Optional: force Next.js to re-render
+  };
+
   const waterLevel = 50;
+
+  // Show badge purchase prompt if user does not have supporterBadge
+  if (user && !user.user_metadata?.supporterBadge) {
+    return (
+      <main className="relative min-h-screen bg-gray-600 text-white flex items-center justify-center">
+        <div>
+          <p>You do not have a Supporter Badge yet.</p>
+          <a
+            href="https://buy.stripe.com/test_00wbJ1gTF6oifWd9gqdIA00"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 px-4 py-2 bg-blue-500 rounded text-white inline-block"
+          >
+            Buy Supporter Badge & Subscription
+          </a>
+          <button
+            className="mt-4 ml-4 px-4 py-2 bg-green-500 rounded text-white"
+            onClick={refreshSession}
+          >
+            Refresh Status
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="relative min-h-screen bg-gray-600 text-white">

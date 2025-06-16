@@ -1,7 +1,9 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { SessionContextProvider } from "@supabase/auth-helpers-react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,12 +20,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
- return (
+  const [supabase] = useState(() => createBrowserSupabaseClient());
+
+  return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <main className="flex min-h-screen">
-          <section className="flex-grow">{children}</section>
-        </main>
+        <SessionContextProvider supabaseClient={supabase}>
+          <main className="flex min-h-screen">
+            <section className="flex-grow">{children}</section>
+          </main>
+        </SessionContextProvider>
       </body>
     </html>
   );

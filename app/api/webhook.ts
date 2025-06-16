@@ -66,26 +66,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Update Supabase user metadata
     // First fetch user by email
-    const { data: userData, error: fetchError } = await supabase
+    const { data: userData, error: userFetchError } = await supabase
       .from("users")
       .select("id, user_metadata")
       .eq("email", customerEmail)
       .single();
 
-    if (fetchError || !userData) {
-      console.error("User not found in Supabase:", fetchError);
+    if (userFetchError || !userData) {
+      console.error("User not found in Supabase:", userFetchError);
       return res.status(404).send("User not found");
+    }
+
+    // Fetch all users and filter by email (listUsers does not accept email param)
+    const { data: users, error: authFetchError } = await supabase.auth.admin.listUsers();
+    if (authFetchError || !users || users.users.length === 0) {
+      console.error("Auth user not found:", authFetchError);
+      return res.status(404).send("Auth user not found");
+    }
+    const authUser = users.users.find((u) => u.email === customerEmail);
+    if (!authUser) {
+      console.error("Auth user not found with email:", customerEmail);
+      return res.status(404).send("Auth user not found");
     }
 
     // Merge existing user_metadata with supporterBadge = true
     const updatedMetadata = {
-      ...userData.user_metadata,
+      ...authUser.user_metadata,
       supporterBadge: true,
     };
 
     // Update user metadata
     const { error: updateError } = await supabase.auth.admin.updateUserById(
-      userData.id,
+      authUser.id,
       {
         user_metadata: updatedMetadata,
       }
