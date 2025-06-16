@@ -14,12 +14,18 @@ export default function SignUpPage() {
     e.preventDefault();
     setError("");
 
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ email, password });
 
     if (error) {
       setError(error.message);
-    } else {
-      router.push("/profile/sign-In"); // Redirect to sign-in
+    } else if (data.user) {
+      // Link Stripe customer after sign up
+      await fetch("/api/link-stripe-customer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: data.user.id, email }),
+      });
+      router.push("/profile/sign-in"); // Redirect to sign-in
     }
   };
 

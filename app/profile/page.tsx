@@ -5,26 +5,26 @@ import RightSidebar from "@/app/components/RightSidebar";
 import MobileNav from "@/app/components/MobileNav";
 import { supabase } from "@/app/utils/supabaseClient";
 
-type UserProfile = {
+type UserType = {
   id: string;
-  email: string | undefined;
-  created_at: string | null;
+  email: string | null;
+  created_at: string;
   user_metadata: {
     display_name?: string;
     phone?: string;
     [key: string]: unknown;
-  } | null;
+  };
 };
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  // remove loading state
-  // const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<UserType | null>(null);
   const [displayName, setDisplayName] = useState("");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
 
   useEffect(() => {
+    // Fetch user data first
     const fetchUser = async () => {
       const { data, error } = await supabase.auth.getUser();
       if (error) {
@@ -34,17 +34,38 @@ export default function ProfilePage() {
       } else if (data.user) {
         const userData = {
           id: data.user.id,
-          email: data.user.email,
+          email: data.user.email ?? null,
           created_at: data.user.created_at,
           user_metadata: data.user.user_metadata,
         };
         setUser(userData);
         setDisplayName(data.user.user_metadata?.display_name || "");
+
+        // Only fetch subscription if user and user.id exist
+        if (data.user && data.user.id) {
+          fetch(`/api/get-subscription?userId=${data.user.id}`)
+            .then((res) => res.json())
+            .then((subData) => {
+              console.log("Subscription API response:", subData); // For debugging
+              if (
+                subData.subscription &&
+                subData.subscription.status === "active"
+              ) {
+                setStatus("active");
+              } else if (subData.error === "No Stripe customer found.") {
+                setStatus("no_customer");
+              } else if (subData.error === "No subscription found.") {
+                setStatus("no_active_subscription");
+              } else {
+                setStatus("no_active_subscription");
+              }
+            })
+            .catch(() => setStatus("no_active_subscription"));
+        }
       } else {
         setUser(null);
         setDisplayName("");
       }
-      // no loading state to update
     };
 
     fetchUser();
@@ -67,7 +88,7 @@ export default function ProfilePage() {
     } else if (data.user) {
       setUser({
         id: data.user.id,
-        email: data.user.email,
+        email: data.user.email ?? null,
         created_at: data.user.created_at,
         user_metadata: data.user.user_metadata,
       });
@@ -76,9 +97,6 @@ export default function ProfilePage() {
 
     setSaving(false);
   };
-
-  // Instead of blocking render, show main UI immediately
-  // Display fallback info if user is null
 
   return (
     <main className="min-h-screen bg-gray-800 text-white relative">
@@ -96,7 +114,7 @@ export default function ProfilePage() {
       >
         <div
           className="
-            bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl
+            bg-slate-900 backdrop-blur-sm border border-white/20 rounded-2xl
             p-6 transition
           "
         >
@@ -133,7 +151,7 @@ export default function ProfilePage() {
             <input
               id="displayName"
               type="text"
-              className="w-full rounded border border-gray-600 bg-gray-900 p-2 mb-2 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-full rounded border border-gray-600 bg-gray-800 p-2 mb-2 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               disabled={saving || !user}
@@ -150,38 +168,17 @@ export default function ProfilePage() {
           </div>
         </div>
       </section>
-      <section
-        className="
-    pt-20 px-4 pb-8
-          md:pl-72 md:pr-72 md:pt-10
-          max-w-5xl mx-auto
-          grid gap-6
-  "
-      >
-        <h2 className="text-xl font-bold mb-3">
-          Supporter Badge & Subscription Status
-        </h2>
-        {user ? (
-          user.user_metadata?.supporterBadge ? (
-            <p className="text-green-400 font-semibold">
-              🎉 You have the Supporter Badge! Thank you for your support.
-            </p>
-          ) : (
-            <p className="text-yellow-300">
-              You do not have a Supporter Badge yet.{" "}
-              <a
-                href="https://buy.stripe.com/test_00wbJ1gTF6oifWd9gqdIA00"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-blue-400"
-              >
-                Buy Supporter Badge & Subscription
-              </a>
-            </p>
-          )
-        ) : (
-          <p>Please sign in to view your supporter status.</p>
-        )}
+
+      <section className="pt-20 px-4 pb-8 md:pl-72 md:pr-72 md:pt-10 max-w-5xl mx-auto grid gap-6">
+        <div className="bg-slate-900 backdrop-blur-sm border border-white/20 rounded-2xl p-6 transition">
+          <h2 className="text-2xl font-bold mb-4">Subscription Status</h2>
+          {status === "active" && <p>You have an active subscription.</p>}
+          {status === "no_active_subscription" && (
+            <p>No active subscription found.</p>
+          )}
+          {status === "no_customer" && <p>No Stripe customer found.</p>}
+          <small className="text-sm text-gray-400">Powered by Stripe</small>
+        </div>
       </section>
     </main>
   );
