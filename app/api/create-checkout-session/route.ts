@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     // Get user from Supabase
     const { data: user, error } = await supabase
-      .from("User")
+      .from("users")
       .select("stripe_customer_id, email")
       .eq("id", userId)
       .single();

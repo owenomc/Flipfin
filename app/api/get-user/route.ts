@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   }
 
   const { data, error } = await supabase
-    .from("User")
+    .from("users")
     .select("*")
     .eq("id", userId)
     .single();

@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
     // Update user in Supabase
     await supabase
-      .from("User")
+      .from("users")
       .update({ stripe_subscription_status: status })
       .eq("stripe_customer_id", customerId);
   }
